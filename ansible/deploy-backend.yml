@@ -1,0 +1,37 @@
+---
+- name: Deploy Redis and worker
+  hosts: backend_servers
+  become: true
+
+  tasks:
+    - name: Pull Redis image
+      community.docker.docker_image:
+        name: redis:alpine
+        source: pull
+
+    - name: Start Redis container
+      community.docker.docker_container:
+        name: voting-redis
+        image: redis:alpine
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "6379:6379"
+
+    - name: Pull worker image
+      community.docker.docker_image:
+        name: uzairirondocker/my-worker:v1
+        source: pull
+
+    - name: Start worker container
+      community.docker.docker_container:
+        name: voting-worker
+        image: uzairirondocker/my-worker:v1
+        state: started
+        restart_policy: unless-stopped
+        env:
+          DB_HOST: "10.0.3.123"
+          DB_USERNAME: "postgres"
+          DB_PASSWORD: "postgres"
+          DB_NAME: "postgres"
+          REDIS_HOST: "10.0.2.40"

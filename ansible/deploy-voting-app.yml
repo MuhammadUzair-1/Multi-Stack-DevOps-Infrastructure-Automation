@@ -1,0 +1,58 @@
+
+---
+- name: Deploy PostgreSQL
+  hosts: database_servers
+  become: true
+  tasks:
+    - name: Pull PostgreSQL image
+      community.docker.docker_image:
+        name: postgres:15-alpine
+        source: pull
+
+    - name: Run PostgreSQL container
+      community.docker.docker_container:
+        name: db
+        image: postgres:15-alpine
+        state: started
+        restart_policy: unless-stopped
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+        ports:
+          - "5432:5432"
+        volumes:
+          - db-data:/var/lib/postgresql/data
+
+- name: Deploy Redis
+  hosts: backend_servers
+  become: true
+  tasks:
+    - name: Pull Redis image
+      community.docker.docker_image:
+        name: redis:alpine
+        source: pull
+
+    - name: Run Redis container
+      community.docker.docker_container:
+        name: redis
+        image: redis:alpine
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "6379:6379"
+
+- name: Deploy worker
+  hosts: backend_servers
+  become: true
+  tasks:
+    - name: Pull worker image
+      community.docker.docker_image:
+        name: uzairirondocker/my-worker:v1
+        source: pull
+
+    - name: Run worker container
+      community.docker.docker_container:
+        name: worker
+        image: uzairirondocker/my-worker:v1
+        state: started
+        restart_policy: unless-stopped

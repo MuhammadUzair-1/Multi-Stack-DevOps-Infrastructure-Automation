@@ -1,37 +1,42 @@
-# Ironhack note - This file is for running in docker compose with prebuilt images
-# Use these if you're stuck, or if you want to start slowly migrating from external images into your own.
+
 
 services:
   vote:
-    image: pokfinner/vote:latest
- #  build: ./vote
+    image: uzairirondocker/my-vote:v2
+    build:
+      context: ./vote
+      dockerfile: Dockerfile.uzair
     depends_on:
       redis:
-        condition: service_healthy 
+        condition: service_healthy
     ports:
-      - "8080:80"
+      - "8082:8080"
     networks:
       - back-tier
 
   result:
-    image: pokfinner/result:latest
- #  build: ./result
+    image: uzairirondocker/my-result:v1
+    build:
+      context: ./result
+      dockerfile: Dockerfile.uzair
     depends_on:
       db:
-        condition: service_healthy 
+        condition: service_healthy
     ports:
       - "8081:80"
     networks:
       - back-tier
 
   worker:
- #  build: ./worker
-    image: pokfinner/worker:latest
+    image: uzairirondocker/my-worker:v1
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.uzair
     depends_on:
       redis:
-        condition: service_healthy 
+        condition: service_healthy
       db:
-        condition: service_healthy 
+        condition: service_healthy
     networks:
       - back-tier
 

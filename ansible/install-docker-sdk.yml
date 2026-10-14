@@ -1,0 +1,24 @@
+---
+- name: Install Docker Python SDK in a virtual environment
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install Python virtual environment support
+      ansible.builtin.dnf:
+        name:
+          - python3-pip
+          - python3
+        state: present
+
+    - name: Create Python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/ansible-docker-venv
+        creates: /opt/ansible-docker-venv/bin/python
+
+    - name: Install Docker SDK in virtual environment
+      ansible.builtin.pip:
+        name: docker
+        state: present
+        virtualenv: /opt/ansible-docker-venv
+        virtualenv_command: python3 -m venv

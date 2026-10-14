@@ -1,0 +1,31 @@
+
+---
+- name: Deploy PostgreSQL database
+  hosts: database_servers
+  become: true
+
+  tasks:
+    - name: Pull PostgreSQL image
+      community.docker.docker_image:
+        name: postgres:15-alpine
+        source: pull
+
+    - name: Create persistent database volume
+      community.docker.docker_volume:
+        name: voting-db-data
+        state: present
+
+    - name: Start PostgreSQL container
+      community.docker.docker_container:
+        name: voting-db
+        image: postgres:15-alpine
+        state: started
+        restart_policy: unless-stopped
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_DB: "postgres"
+        published_ports:
+          - "5432:5432"
+        volumes:
+          - voting-db-data:/var/lib/postgresql/data

@@ -1,0 +1,15 @@
+aws_region    = "eu-central-1"
+project_name  = "ironhack-voting"
+instance_type = "t3.small"
+
+# Existing EC2 key pair name previously found in your AWS account.
+key_name = "ironhack-voting-app-key"
+
+# Update this if your current public IP has changed. Keep /32 for one address.
+my_ip = "185.52.247.43/32"
+
+# Previously retrieved Amazon Linux 2023 AMI ID for eu-central-1; verify before apply.
+ami_id = "ami-085c681bbe9389324"
+
+# false avoids NAT Gateway charges, but private instances cannot pull images or packages from the internet.
+enable_nat_gateway = false

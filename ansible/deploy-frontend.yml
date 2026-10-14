@@ -1,0 +1,45 @@
+
+
+---
+- name: Deploy voting and results applications
+  hosts: frontend_servers
+  become: true
+
+  tasks:
+    - name: Pull voting image
+      community.docker.docker_image:
+        name: uzairirondocker/my-vote:v2
+        source: pull
+
+    - name: Start voting application
+      community.docker.docker_container:
+        name: voting-app
+        image: uzairirondocker/my-vote:v2
+        state: started
+        restart_policy: unless-stopped
+        env:
+          REDIS_HOST: "10.0.2.40"
+          REDIS_PORT: "6379"
+        published_ports:
+          - "8082:8080"
+
+    - name: Pull results image
+      community.docker.docker_image:
+        name: uzairirondocker/my-result:v1
+        source: pull
+
+    - name: Start results application
+      community.docker.docker_container:
+        name: voting-result
+        image: uzairirondocker/my-result:v1
+        state: started
+        restart_policy: unless-stopped
+        env:
+          PORT: "80"
+          PG_HOST: "10.0.3.123"
+          PG_PORT: "5432"
+          PG_USER: "postgres"
+          PG_PASSWORD: "postgres"
+          PG_DATABASE: "postgres"
+        published_ports:
+          - "8081:80"
